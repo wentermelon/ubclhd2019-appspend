@@ -15,7 +15,7 @@ def hello():
 # path parameters
 @app.route('/<name>')
 def personal_hello(name):
-    return "Hello " + name
+    return "Hello " + name + "."
 
 # serving hello.html
 @app.route('/fancy/<name>')
