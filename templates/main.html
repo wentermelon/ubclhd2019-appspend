@@ -1,0 +1,33 @@
+<html lang='en'>
+<head>
+  <meta charset="utf-8" />
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="{{ url_for('static',
+                        filename='style_find.css')}}" />
+</head>
+<body>
+  <div class="centeredcol">
+    <h1>Overview</h1>
+    {% for friend in friends %}
+      <div class="candidate">
+        <p id="name"><b>{{ friend }}</b> - {{ friends[friend] }}</p>
+      </div>
+    {% endfor %}
+
+    <form action="/addexpense" method="post">
+      <input type="text" name="addexpense" placeholder="Add"><br><br>
+      <input type="submit" name="add" value="Add"><br>
+    </form>
+
+    <form action="/removeexpense" method="post">
+      <input type="text" name="removeexpense" placeholder="Remove"><br><br>
+      <input type="submit" name="remove" value="Remove"><br>
+    </form>
+
+    <form action="/logout" method="post">
+      <input type="submit" name="logout" value="Log Out"><br>
+    </form>
+
+  </div>
+</body>
+</html>

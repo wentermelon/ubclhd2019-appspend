@@ -4,57 +4,134 @@
 # Import Flask
 import flask
 import requests
+import json
 
 # Create the application
 app = flask.Flask(__name__)
 
-@app.route('/')
-def hello():
-    return "Hello World!"
+current_user = ''
 
-# path parameters
-@app.route('/<name>')
-def personal_hello(name):
-    return "Hello " + name
+@app.route('/', methods=['GET'])
+def welcome():
+    return flask.render_template('login.html')
 
-# serving hello.html
-@app.route('/fancy/<name>')
-def some_page(name):
-    return flask.render_template('hello.html', name=name)
+@app.route('/login', methods=['post'])
+def login():
 
-# serving find.html
-@app.route('/find', methods=['GET'])
-def find():
-    return flask.render_template('find.html')
+    global current_user
 
-# process query
-@app.route('/process_query', methods=['post'])
-def process_query():
     data = flask.request.form
-    location = data['some_location']
 
-    requestString = formRequest(location)
-    responses = makeGET(requestString)['candidates']
-    return flask.render_template('find.html', responses=responses)
+    username = data['username']
+    password = data['password']
 
-def formRequest(input):
+    if username is "" or password is "":
+        return flask.render_template('badlogin.html')
 
-    API_URL = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?inputtype=textquery&locationbias=ipbias&fields=formatted_address,name,rating&"
+    with open('accounts.json') as json_file:
+        accounts = json.load(json_file)
 
-    return API_URL + "key={k}&input={i}".format(k=readKey(), i=input)
+    for account in accounts:
+        if account['username'] == username and account['password'] == password:
 
-def makeGET(input):
-    response = requests.get(input)
+            current_user = username
 
-    if response:
-        return response.json()
-    else:
-        return "Error GETting that URL. Check to see if it is well-formed?"
+            friend_list = account['friends']
 
-def readKey():
-    f = open("secrets.txt", "r")
-    contents = f.read()
-    return contents.strip()
+            friend_expenses = {}
+
+            friend_expenses[username] = account['expenses']
+
+            for friend in friend_list:
+                for acct in accounts:
+                    if acct['username'] == friend:
+                        friend_expenses[friend] = acct['expenses']
+
+            return flask.render_template('main.html', friends=friend_expenses)
+
+    return flask.render_template('badlogin.html')
+
+
+@app.route('/logout', methods=['post'])
+def logout():
+    global current_user
+
+    current_user = ''
+
+    return flask.render_template('login.html')
+
+
+@app.route('/addexpense', methods=['post'])
+def addexpense():
+    global current_user
+
+    data = flask.request.form
+
+    expense = data['addexpense']
+
+    if expense == '':
+        return flask.render_template('main.html')
+
+    with open('accounts.json') as json_file:
+        accounts = json.load(json_file)
+
+    for account in accounts:
+        if account['username'] == current_user:
+            account['expenses'] += int(expense)
+
+            with open('accounts.json', 'w') as json_file:
+                json.dump(accounts, json_file)
+
+            friend_list = account['friends']
+
+            friend_expenses = {}
+
+            friend_expenses[current_user] = account['expenses']
+
+            for friend in friend_list:
+                for acct in accounts:
+                    if acct['username'] == friend:
+                        friend_expenses[friend] = acct['expenses']
+
+            return flask.render_template('main.html', friends=friend_expenses)
+
+@app.route('/removeexpense', methods=['post'])
+def removeexpense():
+    global current_user
+
+    data = flask.request.form
+
+    expense = data['removeexpense']
+
+    if expense == '':
+        return flask.render_template('main.html')
+
+    with open('accounts.json') as json_file:
+        accounts = json.load(json_file)
+
+    for account in accounts:
+        if account['username'] == current_user:
+            if (account['expenses'] - int(expense)) < 0:
+                account['expenses'] = 0
+            else:
+                account['expenses'] -= int(expense)
+
+            with open('accounts.json', 'w') as json_file:
+                json.dump(accounts, json_file)
+
+            friend_list = account['friends']
+
+            friend_expenses = {}
+
+            friend_expenses[current_user] = account['expenses']
+
+            for friend in friend_list:
+                for acct in accounts:
+                    if acct['username'] == friend:
+                        friend_expenses[friend] = acct['expenses']
+
+            return flask.render_template('main.html', friends=friend_expenses)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

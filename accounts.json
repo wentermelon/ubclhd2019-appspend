@@ -1,0 +1,1 @@
+[{"username": "wency", "password": "test", "expenses": 10000, "friends": ["cindy", "kevin"]}, {"username": "cindy", "password": "test", "expenses": 0, "friends": ["wency", "ming"]}, {"username": "kevin", "password": "test", "expenses": 200, "friends": ["wency", "ming"]}, {"username": "ming", "password": "test", "expenses": 1000, "friends": ["cindy", "kevin"]}]

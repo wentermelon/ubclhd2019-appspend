@@ -1,0 +1,24 @@
+<html lang='en'>
+<head>
+  <meta charset="utf-8" />
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="{{ url_for('static',
+                        filename='style_find.css')}}" />
+</head>
+<body>
+  <div class="centeredcol">
+    <form action="/login" method="post">
+      <h1>Appspend</h1>
+      <h2>Login</h2>
+      <input type="text" name="username" placeholder="Username"><br><br>
+	  <input type="text" name="password" placeholder="Password"><br><br>
+	  <input type="submit" name="submit" value="Log In"><br>
+    </form>
+    {% for friend in friends %}
+      <div class="candidate">
+        <p id="name"><b>{{ friend }}</b> - {{ friends[friend] }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</body>
+</html>
