@@ -11,6 +11,7 @@ For our interface, we used the HTML/CSS template provided during the Flask works
 
 ### Login
 The landing page for the website begins with a simple login screen for the user to access their account.
+
 *Note: The current functionality is limited to hardcoded accounts located in accounts.json*
 
 ### Overview
